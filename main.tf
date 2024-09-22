@@ -30,6 +30,7 @@ resource "aws_sqs_queue" "egoistsqsqueue" {
     deadLetterTargetArn = aws_sqs_queue.egoistdlq.arn
     maxReceiveCount = 5
   })
+  visibility_timeout_seconds = 60
 
   tags = {
     env = var.env
@@ -143,7 +144,7 @@ resource "aws_iam_policy_attachment" "monthly-cron-role-attachment" {
   policy_arn = aws_iam_policy.aws-lambda-basic-exec.arn
 }
 resource "aws_lambda_function" "egoist-monthly-cron" {
-  function_name = "egoist-monthly-cron"
+  function_name = "egoist-${var.env}-monthly-cron"
   package_type = "Image"
   image_uri = "${var.aws_account_url}${aws_ecr_repository.egoist-monthly-cron.name}:latest"
   role = aws_iam_role.egoist-monthly-cron-lambda-role.arn
@@ -207,7 +208,7 @@ resource "aws_iam_policy_attachment" "weekly-cron-role-attachment" {
   policy_arn = aws_iam_policy.aws-lambda-basic-exec.arn
 }
 resource "aws_lambda_function" "egoist-weekly-cron" {
-  function_name = "egoist-weekly-cron"
+  function_name = "egoist-${var.env}-weekly-cron"
   package_type = "Image"
   image_uri = "${var.aws_account_url}${aws_ecr_repository.egoist-weekly-cron.name}:latest"
   role = aws_iam_role.egoist-weekly-cron-lambda-role.arn
@@ -276,7 +277,7 @@ resource "aws_iam_policy_attachment" "sqs-ffmpeg-role-sqs-attachment" {
   policy_arn = aws_iam_policy.aws-lambda-sqs-basic-exec.arn
 }
 resource "aws_lambda_function" "egoist-sqs-ffmpeg" {
-  function_name = "egoist-sqs-ffmpeg"
+  function_name = "egoist-${var.env}-sqs-ffmpeg"
   package_type = "Image"
   image_uri = "${var.aws_account_url}${aws_ecr_repository.egoist-sqs-ffmpeg.name}:latest"
   role = aws_iam_role.egoist-sqs-ffmpeg-lambda-role.arn
